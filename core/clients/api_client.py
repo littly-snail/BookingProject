@@ -4,7 +4,7 @@ import allure
 from dotenv import load_dotenv
 from core.settings.environments import Environment
 from core.clients.endpoints import Endpoints
-from core.settings.config import Credentials, Timeouts, Ids
+from core.settings.config import Credentials, Timeouts
 
 load_dotenv()
 
@@ -71,12 +71,12 @@ class APIClient:
             self.session.headers.update({"Authorization": f"Bearer {token}"})
 
     @allure.title("Get booking by id")
-    def get_booking_by_id(self, status_code=200):
+    def get_booking_by_id(self, booking_id):
         with allure.step('Make a request to get booking by id'):
-            booking_id = Ids.id1
             url = f"{self.base_url}{Endpoints.BOOKING_ENDPOINT}/{booking_id}"
             response = self.session.get(url, headers=self.session.headers)
         with allure.step('Assert status code'):
-            assert response.status_code == status_code, f"Expected status code {status_code} but got {response.status_code}"
-        if 200 <= response.status_code < 300:
-            return response.json()
+            assert response.status_code == 200, f"Expected status code 200 but got {response.status_code}"
+        with allure.step('Return json'):
+            if response.status_code == 200:
+                return response.json()

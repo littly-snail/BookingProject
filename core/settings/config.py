@@ -7,7 +7,3 @@ class Credentials(Enum):
 
 class Timeouts(Enum):
     TIMEOUT = 5
-
-class Ids(Enum):
-    id1 = 1
-    id2 = 99999
