@@ -17,10 +17,16 @@ def booking_dates():
     checkin_date = today + timedelta(days=10)
     checkout_date = checkin_date + timedelta(days=5)
 
+    # return {
+    #     "checkin": checkin_date.strftime("%Y-%m-%d"),
+    #     "checkout": checkout_date.strftime("%Y-%m-%d")
+    # }
+
     return {
-        "checkin": checkin_date.strftime("%Y-%m-%d"),
-        "checkout": checkout_date.strftime("%Y-%m-%d")
+        "checkin": "2018-01-01",
+        "checkout": "2019-01-01",
     }
+
 
 @pytest.fixture
 def generate_random_booking_data(booking_dates):
@@ -42,7 +48,8 @@ def generate_random_booking_data(booking_dates):
         "separate beds requested"
     ]
 
-    additionalneeds = random.sample(needs_options, k=2) # 2 разных случайных элемента
+    # additionalneeds =  ", ".join(random.sample(needs_options, k=2)) # 2 разных случайных элемента
+    additionalneeds = ", ".join(random.sample(needs_options, k=1))
 
     data = {
     "firstname": firstname,
