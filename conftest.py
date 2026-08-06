@@ -3,6 +3,7 @@ from core.clients.api_client import APIClient
 from datetime import datetime, timedelta
 from faker import Faker
 import random
+import copy
 
 
 @pytest.fixture(scope="session")
@@ -17,16 +18,10 @@ def booking_dates():
     checkin_date = today + timedelta(days=10)
     checkout_date = checkin_date + timedelta(days=5)
 
-    # return {
-    #     "checkin": checkin_date.strftime("%Y-%m-%d"),
-    #     "checkout": checkout_date.strftime("%Y-%m-%d")
-    # }
-
     return {
-        "checkin": "2018-01-01",
-        "checkout": "2019-01-01",
+        "checkin": checkin_date.strftime("%Y-%m-%d"),
+        "checkout": checkout_date.strftime("%Y-%m-%d")
     }
-
 
 @pytest.fixture
 def generate_random_booking_data(booking_dates):
@@ -48,8 +43,7 @@ def generate_random_booking_data(booking_dates):
         "separate beds requested"
     ]
 
-    # additionalneeds =  ", ".join(random.sample(needs_options, k=2)) # 2 разных случайных элемента
-    additionalneeds = ", ".join(random.sample(needs_options, k=1))
+    additionalneeds =  ", ".join(random.sample(needs_options, k=2)) # 2 разных случайных элемента
 
     data = {
     "firstname": firstname,
@@ -62,3 +56,16 @@ def generate_random_booking_data(booking_dates):
 
     return data
 
+
+@pytest.fixture
+def random_booking_data_with_none_totalprice(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    data["totalprice"] = None
+    return data
+
+
+@pytest.fixture
+def random_booking_data_without_bookingdates(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    data.pop("bookingdates", None)
+    return data

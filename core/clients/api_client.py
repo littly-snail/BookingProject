@@ -21,8 +21,9 @@ class APIClient:
         self.base_url = self.get_base_url(environment)
         self.session = requests.Session()
         self.session.headers = {
-            "Content-Type": "application/json"
-        }
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+            }
 
 
     def get_base_url(self, environment: Environment) -> str:
@@ -70,14 +71,15 @@ class APIClient:
                 "password": Credentials.PASSWORD.value
             }
             response = self.session.post(url, json=payload, timeout=Timeouts.TIMEOUT.value)
+            response = self.session.post(url, json=payload, timeout=Timeouts.TIMEOUT.value)
             response.raise_for_status()
         with allure.step('Checking status code'):
             assert response.status_code == 200, f"Expected status code 200 but got {response.status_code}"
         token = response.json().get("token")
         with allure.step('Checking token'):
             assert token, f"Token is missing in response"
-        with allure.step('Updating header with token'):
-            self.session.headers.update({"Authorization": f"Bearer {token}"})
+        with allure.step('Updating cookies with token'):
+            self.session.cookies.update({"Authorization": f"Bearer {token}"})
 
 
     @allure.title("Get booking by id")
@@ -117,16 +119,7 @@ class APIClient:
     def create_booking(self, booking_data):
         with allure.step('Booking creating'):
             url = f"{self.base_url}{Endpoints.BOOKING_ENDPOINT.value}"
-
-            # response = self.session.post(url, json=booking_data)
-
-            response = requests.post(
-                url,
-                json=booking_data,
-                headers={"Content-Type": "application/json"},
-            )
-
-            response.raise_for_status()
+        response = self.session.post(url, json=booking_data)
         with allure.step('Checking status code'):
             assert response.status_code == 200, f"Expected status code 200 but got {response.status_code}"
         return response.json()
