@@ -71,7 +71,6 @@ class APIClient:
                 "password": Credentials.PASSWORD.value
             }
             response = self.session.post(url, json=payload, timeout=Timeouts.TIMEOUT.value)
-            response = self.session.post(url, json=payload, timeout=Timeouts.TIMEOUT.value)
             response.raise_for_status()
         with allure.step('Checking status code'):
             assert response.status_code == 200, f"Expected status code 200 but got {response.status_code}"
