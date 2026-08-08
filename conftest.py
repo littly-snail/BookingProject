@@ -3,6 +3,7 @@ from core.clients.api_client import APIClient
 from datetime import datetime, timedelta
 from faker import Faker
 import random
+import copy
 
 
 @pytest.fixture(scope="session")
@@ -42,7 +43,7 @@ def generate_random_booking_data(booking_dates):
         "separate beds requested"
     ]
 
-    additionalneeds = random.sample(needs_options, k=2) # 2 разных случайных элемента
+    additionalneeds =  ", ".join(random.sample(needs_options, k=2)) # 2 разных случайных элемента
 
     data = {
     "firstname": firstname,
@@ -55,3 +56,30 @@ def generate_random_booking_data(booking_dates):
 
     return data
 
+
+@pytest.fixture
+def random_booking_data_with_none_totalprice(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    data["totalprice"] = None
+    return data
+
+
+@pytest.fixture
+def random_booking_data_without_bookingdates(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    data.pop("bookingdates", None)
+    return data
+
+
+@pytest.fixture
+def random_booking_data_with_unexpected_field(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    data["unexpected_field"] = "green dwarf"
+    return data
+
+
+@pytest.fixture
+def random_booking_data_with_leading_zeros_totalprice(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    data["totalprice"] = f"{int(data['totalprice']):06d}"
+    return data
