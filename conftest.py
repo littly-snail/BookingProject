@@ -69,3 +69,17 @@ def random_booking_data_without_bookingdates(generate_random_booking_data):
     data = copy.deepcopy(generate_random_booking_data)
     data.pop("bookingdates", None)
     return data
+
+
+@pytest.fixture
+def random_booking_data_with_unexpected_field(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    data["unexpected_field"] = "green dwarf"
+    return data
+
+
+@pytest.fixture
+def random_booking_data_with_leading_zeros_totalprice(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    data["totalprice"] = f"{int(data['totalprice']):06d}"
+    return data
