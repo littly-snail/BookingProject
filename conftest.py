@@ -83,3 +83,11 @@ def random_booking_data_with_leading_zeros_totalprice(generate_random_booking_da
     data = copy.deepcopy(generate_random_booking_data)
     data["totalprice"] = f"{int(data['totalprice']):06d}"
     return data
+
+@pytest.fixture
+def random_booking_data_with_int_name(generate_random_booking_data):
+    data = copy.deepcopy(generate_random_booking_data)
+    faker = Faker() # создаём объект класса Faker
+    int_firstname = faker.random_number(digits=3) # теперь пользуемся этим объектом
+    data["firstname"] = int_firstname
+    return data

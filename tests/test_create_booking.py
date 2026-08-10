@@ -1,11 +1,42 @@
 import allure
 import pytest
 from requests.exceptions import HTTPError
+from pydantic import ValidationError
+from core.models.booking import BookingResponse
 
 
 @allure.feature("Test create booking")
-@allure.story("Test create correct booking")
-def test_correct_booking(api_client, generate_random_booking_data):
+@allure.story("Positive test: create booking with custom data")
+def test_create_booking_with_custom_data(api_client):
+    booking_data = {
+        "firstname": "Ubdurahman",
+        "lastname": "Ubdrahmanov",
+        "totalprice": 5000,
+        "depositpaid": True,
+        "bookingdates": {
+            "checkin": "2026-08-10",
+            "checkout": "2026-08-17"
+        },
+        "additionalneeds": "halal meal"
+    }
+
+    response = api_client.create_booking(booking_data)
+    try:
+        BookingResponse(**response)
+    except ValidationError as e:
+        raise ValidationError(f"Response validation failed: {e}")
+
+    assert response["booking"]["firstname"] == booking_data["firstname"], "Имя гостя не совпало с ожидаемым"
+    assert response["booking"]["lastname"] == booking_data["lastname"], "Фамилия гостя не совпала с ожидаемой"
+    assert response["booking"]["totalprice"] == booking_data["totalprice"], "Сумма бронирования не совпала с ожидаемой"
+    assert response["booking"]["depositpaid"] == booking_data["depositpaid"], "Статус оплаты не совпал с ожидаемым"
+    assert response["booking"]["bookingdates"] == booking_data["bookingdates"], "Даты бронирования не совпали с ожидаемыми"
+    assert response["booking"]["additionalneeds"] == booking_data["additionalneeds"], "Доп.пожелания не совпали с ожидаемыми"
+
+
+@allure.feature("Test create booking")
+@allure.story("Positive test: Test create booking with random data")
+def test_correct_booking_with_random_data(api_client, generate_random_booking_data):
     b_json = api_client.create_booking(generate_random_booking_data)["booking"]
     assert b_json["firstname"] == generate_random_booking_data["firstname"], "Имя гостя не совпало с ожидаемым"
     assert b_json["lastname"] == generate_random_booking_data["lastname"], "Фамилия гостя не совпала с ожидаемой"
@@ -54,3 +85,12 @@ def test_booking_with_leading_zeros_totalprice(api_client, random_booking_data_w
     assert b_json["depositpaid"] == random_booking_data_with_leading_zeros_totalprice["depositpaid"], "Статус оплаты не совпал с ожидаемым"
     assert b_json["bookingdates"] == random_booking_data_with_leading_zeros_totalprice["bookingdates"], "Даты бронирования не совпали с ожидаемыми"
     assert b_json["additionalneeds"] == random_booking_data_with_leading_zeros_totalprice["additionalneeds"], "Доп.пожелания не совпали с ожидаемыми"
+
+
+@allure.feature("Test create booking")
+@allure.story("Negative test: create booking with int firstname")
+def test_booking_with_int_firstname(api_client, random_booking_data_with_int_name):
+    with pytest.raises(HTTPError, match="500"):
+        api_client.create_booking(random_booking_data_with_int_name)
+
+
